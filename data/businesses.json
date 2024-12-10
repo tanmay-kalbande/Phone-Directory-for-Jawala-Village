@@ -43,14 +43,14 @@
                   ],
     "businesses": [
         { "id": "1", "category": "vermicelli_processing", "shopName": "उन्नती गृह उद्योग", "ownerName": "माधुरी संजय काळबांडे", "contactNumber": "8275838227" },
-        { "id": "2", "category": "automobile", "shopName": "पार्वती ऑटोमोबाइल", "ownerName": "गोलू काळबांडे", "contactNumber": "9922287156" },
-        { "id": "3", "category": "puja_items", "shopName": "गोविंद अगरबत्ती, परफ्युम्स फ्रेमिंग", "ownerName": "जयकुमार वानखेडे", "contactNumber": "7775875877" },
-        { "id": "4", "category": "photography", "shopName": "प्राजक्ता फोटो स्टूडिओ", "ownerName": "जितेंद्र चोपडे", "contactNumber": "9850371113" },
-        { "id": "5", "category": "clothing", "shopName": "शंभो मेन्स वेअर", "ownerName": "संकेत गड्डमवार", "contactNumber": "9309123180" },
-        { "id": "6", "category": "fruits_vegetables", "shopName": "श्री द्त्त समाधान फ्रूट सेंटर", "ownerName": "अनिल हरिभाऊ कोटमकार", "contactNumber": "9850870979" },
-        { "id": "7", "category": "groceries", "shopName": "राहुल किराणा होलसेल", "ownerName": "राहुल पद्मावार", "contactNumber": "8605615311" },
-        { "id": "8", "category": "fruits_vegetables", "shopName": "श्री साई फ्रूट सेंटर", "ownerName": "सुरज नामदेव निरपासे", "contactNumber": "7745060546" },
-        { "id": "9", "category": "restaurants", "shopName": "चिंतामणी हाँटेल", "ownerName": "सुरज कामडी", "contactNumber": "7498026007" },
-        { "id": "10", "category": "clothing", "shopName": "माँ संतोषी साडी अँन्ड ड्रेसेस", "ownerName": "निलेश ठक", "contactNumber": "9767696838" }
+        { "id": "2", "category": "puja_items", "shopName": "गोविंद अगरबत्ती, परफ्युम्स फ्रेमिंग", "ownerName": "जयकुमार वानखेडे", "contactNumber": "7775875877" },
+        { "id": "3", "category": "clothing", "shopName": "शंभो मेन्स वेअर", "ownerName": "संकेत गड्डमवार", "contactNumber": "9309123180" },
+        { "id": "4", "category": "automobile", "shopName": "पार्वती ऑटोमोबाइल", "ownerName": "गोलू काळबांडे", "contactNumber": "9922287156" },
+        { "id": "5", "category": "fruits_vegetables", "shopName": "श्री द्त्त समाधान फ्रूट सेंटर", "ownerName": "अनिल हरिभाऊ कोटमकार", "contactNumber": "9850870979" },
+        { "id": "6", "category": "groceries", "shopName": "राहुल किराणा होलसेल", "ownerName": "राहुल पद्मावार", "contactNumber": "8605615311" },
+        { "id": "7", "category": "fruits_vegetables", "shopName": "श्री साई फ्रूट सेंटर", "ownerName": "सुरज नामदेव निरपासे", "contactNumber": "7745060546" },
+        { "id": "8", "category": "restaurants", "shopName": "चिंतामणी हाँटेल", "ownerName": "सुरज कामडी", "contactNumber": "7498026007" },
+        { "id": "9", "category": "clothing", "shopName": "माँ संतोषी साडी अँन्ड ड्रेसेस", "ownerName": "निलेश ठक", "contactNumber": "9767696838" },
+        { "id": "10", "category": "photography", "shopName": "प्राजक्ता फोटो स्टूडिओ", "ownerName": "जितेंद्र चोपडे", "contactNumber": "9850371113" }
     ]
 }
