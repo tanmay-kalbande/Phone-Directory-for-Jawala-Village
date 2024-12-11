@@ -384,3 +384,36 @@ footer .copyright {
         font-size: 0.9rem;
     }
 }
+
+
+.whatsapp-contact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; /* Slightly larger than text size */
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2); /* Transparent background */
+    color: white;
+    margin-left: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent; /* Initial border for hover effect */
+    text-decoration: none; /* Remove underline */
+}
+
+.whatsapp-contact:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* Slightly more opaque on hover */
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1); /* Slight scale effect on hover */
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.15);
+}
+
+.whatsapp-contact i {
+    font-size: 1.2rem; /* Slightly larger icon */
+    transition: transform 0.3s ease;
+}
+
+.whatsapp-contact:hover i {
+    transform: scale(1.1); /* Optional: slight scale effect on hover */
+}
