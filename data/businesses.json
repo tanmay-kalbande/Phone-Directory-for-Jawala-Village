@@ -42,7 +42,7 @@
         { "id": "puja_items", "name": "पूजा साहित्य", "icon": "fa-solid fa-praying-hands" }
                   ],
     "businesses": [
-        { "id": "1", "category": "vermicelli_processing", "shopName": "उन्नती गृह उद्योग", "ownerName": "माधुरी संजय काळबांडे", "contactNumber": "8275838227" },
+        { "id": "1", "category": "vermicelli_processing", "shopName": "उन्नती गृह उद्योग", "ownerName": "सौ.माधुरी संजय काळबांडे", "contactNumber": "8275838227" },
         { "id": "2", "category": "puja_items", "shopName": "गोविंद अगरबत्ती, परफ्युम्स फ्रेमिंग", "ownerName": "जयकुमार वानखेडे", "contactNumber": "7775875877" },
         { "id": "3", "category": "clothing", "shopName": "शंभो मेन्स वेअर", "ownerName": "संकेत गड्डमवार", "contactNumber": "9309123180" },
         { "id": "4", "category": "automobile", "shopName": "पार्वती ऑटोमोबाइल", "ownerName": "गोलू काळबांडे", "contactNumber": "9922287156" },
@@ -51,6 +51,16 @@
         { "id": "7", "category": "fruits_vegetables", "shopName": "श्री साई फ्रूट सेंटर", "ownerName": "सुरज नामदेव निरपासे", "contactNumber": "7745060546" },
         { "id": "8", "category": "restaurants", "shopName": "चिंतामणी हाँटेल", "ownerName": "सुरज कामडी", "contactNumber": "7498026007" },
         { "id": "9", "category": "clothing", "shopName": "माँ संतोषी साडी अँन्ड ड्रेसेस", "ownerName": "निलेश ठक", "contactNumber": "9767696838" },
-        { "id": "10", "category": "photography", "shopName": "प्राजक्ता फोटो स्टूडिओ", "ownerName": "जितेंद्र चोपडे", "contactNumber": "9850371113" }
+        { "id": "10", "category": "photography", "shopName": "प्राजक्ता फोटो स्टूडिओ", "ownerName": "जितेंद्र चोपडे", "contactNumber": "9850371113" },
+        { "id": "11", "category": "stationery", "shopName": "माँ संतोषी जनरल अँन्ड गारमेंट्स", "ownerName": "सौ.जोत्न्सा निलेश ठक", "contactNumber": "9767788062" },
+        { "id": "12", "category": "clothing", "shopName": "महालक्ष्मी साडी सेंटर", "ownerName": "उमेश काळे", "contactNumber": "8788860418" },
+        { "id": "13", "category": "clothing", "shopName": "आनंदी कलेक्शन", "ownerName": "विजय कडूकार", "contactNumber": "9579943358" },
+        { "id": "14", "category": "jewelry_shops", "shopName": "पद्मावार ज्वेलर्स", "ownerName": "आशिष पद्मावार", "contactNumber": "9527725736" },
+        { "id": "15", "category": "jewelry_shops", "shopName": "टाके ज्वेलर्स", "ownerName": "राजेश टाके", "contactNumber": "9763865227" },
+        { "id": "16", "category": "jewelry_shops", "shopName": "अंबिका ज्वेलर्स", "ownerName": "नोयल करमणकर", "contactNumber": "7304422328" },
+        { "id": "17", "category": "clothing", "shopName": "संजय ड्रेसेस & साडी सेंटर", "ownerName": "संजय सांगाणी", "contactNumber": "9850351093" },
+        { "id": "18", "category": "electronics", "shopName": "शर्वरी एंटरप्रायजेस ( इलेक्ट्रोनिक काटे &सी सी टीव्ही )", "ownerName": "सचिन धाये", "contactNumber": "7066967180" },
+        { "id": "19", "category": "tailors", "shopName": "स्वरा लेडिज टेलर", "ownerName": "सौ.अरूणा नितीन पिसे", "contactNumber": "8379864498" },
+        { "id": "20", "category": "transportation", "shopName": "गुड्स एक्सप्रेस", "ownerName": "अमोल ठक", "contactNumber": "9850801017" }      
     ]
 }
