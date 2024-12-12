@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const allCategoriesItem = createAllCategoriesItem();
         categoryGrid.appendChild(allCategoriesItem);
 
-        // Then add other categories
+        // Add unique categories
         const uniqueCategories = getUniqueCategories(categories);
         uniqueCategories.forEach(category => {
             const categoryItem = createCategoryItem(category);
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         categoryItem.classList.add('selected');
         selectedCategory = category.id;
 
-        // Remove the extra category name display
+        // Hide extra category name display
         selectedCategoryName.textContent = '';
         selectedCategoryName.style.opacity = '0';
 
@@ -189,4 +189,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize app
     fetchBusinessData();
+
+    // Disable certain keyboard shortcuts
+    document.addEventListener('keydown', event => {
+        const blockedKeys = ['c', 'x', 'v', 'a', 's', 'u', 'p'];
+        if ((event.ctrlKey || event.metaKey) && blockedKeys.includes(event.key.toLowerCase())) {
+            event.preventDefault();
+        }
+    });
+
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disable long-press context menu (for mobile)
+    document.addEventListener('touchstart', event => {
+        if (event.touches.length > 1) {
+            event.preventDefault(); // Prevent multi-touch gestures
+        }
+    });
 });
