@@ -23,6 +23,10 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    user-select: none;          /* Standard property */
+    -webkit-user-select: none;  /* For Safari/Chrome */
+    -moz-user-select: none;     /* For Firefox */
+    -ms-user-select: none;      /* For Internet Explorer */
 }
 
 .container {
