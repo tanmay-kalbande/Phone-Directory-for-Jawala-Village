@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jawala Business Directory</title>
+    <title>Jawala Village Business Directory - Find Nearby Services</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./assets/images/telephone-directory.png">
@@ -11,12 +11,18 @@
     <!-- Meta Description for SEO -->
     <meta name="description" content="जवळा गाव व्यवसाय निर्देशिका: गावातील व्यवसाय शोधण्यासाठी एक सुलभ साधन. आपल्या जवळच्या सेवा आणि व्यवसायांबद्दल त्वरित माहिती मिळवा.">
 
+    <!-- Geo Tags for Local SEO -->
+    <meta name="geo.region" content="IN-MH">
+    <meta name="geo.placename" content="Jawala, Yavatmal, Maharashtra">
+    <meta name="geo.position" content="20.6282;78.5756">
+    <meta name="ICBM" content="20.6282, 78.5756">
+
     <!-- Vercel Analytics Tracker -->
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
-    
+
     <!-- Open Graph Metadata for Social Sharing -->
     <meta property="og:title" content="जवळा गाव व्यवसाय निर्देशिका">
     <meta property="og:description" content="गावातील सर्व व्यवसायांची सुलभ माहिती मिळवा - Discover and connect with local businesses and essential services in Jawala village.">
@@ -37,41 +43,83 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 
-<!-- Structured Data for Local Business -->
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "जवळा गाव व्यवसाय निर्देशिका",
-    "description": "गावातील विविध सेवा व व्यवसायांबद्दल माहिती मिळवा. A comprehensive local business directory for Jawala village.",
-    "url": "https://jawala-vyapar.vercel.app/",
-    "publisher": {
-        "@type": "Person",
-        "name": "Tanmay Kalbande",
-        "email": "tanmaykalbande@gmail.com"
-    },
-    "applicationCategory": "Business Directory",
-    "operatingSystem": "All",
-    "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR"
-    },
-    "keywords": [
-        "local business",
-        "village directory",
-        "business finder",
-        "जवळा गाव",
-        "व्यवसाय निर्देशिका"
-    ],
-    "inLanguage": ["mr", "en"],
-    "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://jawala-vyapar.vercel.app/?search={search_term}",
-        "query-input": "required name=search_term"
+    <!-- Structured Data for Local Business -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Jawala Village Business Directory",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Jawala",
+        "addressRegion": "Maharashtra",
+        "postalCode": "445001",
+        "addressCountry": "IN"
+      },
+      "telephone": "+917775875877",
+      "url": "https://jawala-vyapar.vercel.app/",
+      "areaServed": {
+        "@type": "GeoCircle",
+        "geoMidpoint": {
+          "@type": "GeoCoordinates",
+          "latitude": "20.6282",
+          "longitude": "78.5756"
+        },
+        "geoRadius": "10 km"
+      }
     }
-}
-</script>
+    </script>
+
+    <!-- Structured Data for Web Application -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "जवळा गाव व्यवसाय निर्देशिका",
+        "description": "गावातील विविध सेवा व व्यवसायांबद्दल माहिती मिळवा. A comprehensive local business directory for Jawala village.",
+        "url": "https://jawala-vyapar.vercel.app/",
+        "publisher": {
+            "@type": "Person",
+            "name": "Tanmay Kalbande",
+            "email": "tanmaykalbande@gmail.com"
+        },
+        "applicationCategory": "Business Directory",
+        "operatingSystem": "All",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+        },
+        "keywords": [
+            "जवळा गाव व्यवसाय निर्देशिका",
+            "स्थानीय व्यवसाय शोधा",
+            "व्यवसाय मार्गदर्शिका",
+            "गावातील सेवा",
+            "स्थानीय सेवा",
+            "जवळा गाव",
+            "यवतमाळ व्यवसाय",
+            "व्यवसाय शोध प्रणाली",
+            "स्थानिक सेवा शोध",
+            "गाव व्यवसाय निर्देशिका",
+            "जवळा यवतमाळ",
+            "महाराष्ट्र व्यवसाय",
+            "गावातील दुकान",
+            "व्यवसाय माहिती",
+            "व्यवसाय सूची",
+            "व्यवसाय नोंदणी",
+            "local business directory",
+            "Jawala village services",
+            "business registration Jawala",
+            "Maharashtra local businesses"
+         ],
+        "inLanguage": ["mr", "en"],
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://jawala-vyapar.vercel.app/?search={search_term}",
+            "query-input": "required name=search_term"
+        }
+    }
+    </script>
 
 </head>
 <body>
