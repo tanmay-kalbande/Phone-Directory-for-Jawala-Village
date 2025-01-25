@@ -66,6 +66,8 @@
         { "id": "17", "category": "clothing", "shopName": "संजय ड्रेसेस & साडी सेंटर", "ownerName": "संजय सांगाणी", "contactNumber": "9850351093" },
         { "id": "18", "category": "electronics", "shopName": "शर्वरी एंटरप्रायजेस ( इलेक्ट्रोनिक काटे &सी सी टीव्ही )", "ownerName": "सचिन धाये", "contactNumber": "7066967180" },
         { "id": "19", "category": "ladies_tailors", "shopName": "स्वरा लेडिज टेलर", "ownerName": "सौ.अरूणा नितीन पिसे", "contactNumber": "8379864498" },
-        { "id": "20", "category": "transportation", "shopName": "गुड्स एक्सप्रेस", "ownerName": "अमोल ठक", "contactNumber": "9850801017" }      
+        { "id": "20", "category": "transportation", "shopName": "गुड्स एक्सप्रेस", "ownerName": "अमोल ठक", "contactNumber": "9850801017" },      
+        { "id": "21", "category": "agriculture_centers", "shopName": "श्री दत्त कृषी केंद्र", "ownerName": "रवी चोपडे", "contactNumber": "9423655255" },
+        { "id": "22", "category": "groceries", "shopName": "पदमावार किराणा अँड डेली नीड्स जवळा", "ownerName": "विशाल विनोद पदमावार", "contactNumber": "9604026006" }
     ]
 }
