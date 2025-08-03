@@ -1,13 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;600;700&family=Mukta:wght@400;600;700&display=swap');
 
 :root {
-    --primary-color: #2C5F2D;        /* Deep Forest Green */
-    --secondary-color: #97BC62;      /* Sage Green */
-    --accent-color: #77A146;         /* Olive Green */
-    --background-color: #F5F5F5;     /* Light Gray */
-    --text-color: #333333;           /* Dark Charcoal */
+    --primary-color: #161A30;        /* Navy */
+    --secondary-color: #31304D;      /* Slate */
+    --accent-color: #B6BBC4;         /* Soft Gray */
+    --background-color: #F0ECE5;     /* Cream */
+    --text-color: #161A30;           /* Dark Text */
     --card-background: #FFFFFF;      /* Pure White */
     --soft-shadow: rgba(0,0,0,0.1);
+}
+
+:root.dark {
+    --primary-color: #58A6FF;
+    --secondary-color: #23D3BD;
+    --accent-color: #FFCC00;
+    --background-color: #0D1117;
+    --card-background: #161B22;
+    --text-color: #E6EDF3;
+    --soft-shadow: rgba(0,0,0,0.4);
 }
 
 * {
@@ -23,10 +33,10 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    user-select: none;          /* Standard property */
-    -webkit-user-select: none;  /* For Safari/Chrome */
-    -moz-user-select: none;     /* For Firefox */
-    -ms-user-select: none;      /* For Internet Explorer */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .container {
@@ -104,6 +114,19 @@ header::after {
     margin-bottom: 15px;
 }
 
+.category-grid.collapsed {
+    display: none;
+}
+
+.selected-category-name {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin: 10px 0;
+    opacity: 1;
+    font-weight: bold; /* Made bold */
+}
+
 .category-item {
     display: flex;
     flex-direction: column;
@@ -150,6 +173,10 @@ header::after {
     box-shadow: inset 0 0 10px var(--soft-shadow);
 }
 
+.category-item.hidden {
+    display: none;
+}
+
 .category-item i {
     font-size: 2.5rem;
     color: var(--primary-color);
@@ -167,6 +194,13 @@ header::after {
     text-align: center;
     font-weight: 600;
     color: var(--text-color);
+}
+
+.category-counter {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    font-weight: 400;
+    margin-left: 5px;
 }
 
 .business-grid {
@@ -229,10 +263,27 @@ header::after {
 }
 
 .business-card h4 {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    cursor: default;
+    margin: 0 0 8px;
+    line-height: 1.6;
+    height: 1.6em;
+    padding: 2px 60px 2px 0; /* Adjusted for gradient */
+    font-size: 1.3rem; /* Increased font size */
     font-weight: 600;
+}
+
+.business-card h4::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 60px; /* Wide gradient for blur-like effect */
+    background: linear-gradient(to right, transparent, var(--card-background));
+    pointer-events: none;
 }
 
 .business-card p {
@@ -294,7 +345,6 @@ header::after {
     }
 }
 
-/* Footer Styles */
 footer {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
@@ -389,35 +439,196 @@ footer .copyright {
     }
 }
 
-
 .whatsapp-contact {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px; /* Slightly larger than text size */
+    width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.2); /* Transparent background */
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
     margin-left: 1px;
     transition: all 0.3s ease;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-    border: 2px solid transparent; /* Initial border for hover effect */
-    text-decoration: none; /* Remove underline */
+    border: 2px solid transparent;
+    text-decoration: none;
 }
 
 .whatsapp-contact:hover {
-    background-color: rgba(255, 255, 255, 0.3); /* Slightly more opaque on hover */
+    background-color: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1); /* Slight scale effect on hover */
+    transform: scale(1.1);
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.15);
 }
 
 .whatsapp-contact i {
-    font-size: 1.2rem; /* Slightly larger icon */
+    font-size: 1.2rem;
     transition: transform 0.3s ease;
 }
 
 .whatsapp-contact:hover i {
-    transform: scale(1.1); /* Optional: slight scale effect on hover */
+    transform: scale(1.1);
 }
+
+.show-all-btn {
+    margin-left: 10px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.show-all-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.loading-overlay {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.7);
+    z-index: 999;
+}
+.loading-overlay.active { display:flex; }
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.gear{position:absolute;top:12px;right:12px;background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer}
+
+.sort-container{margin-bottom:10px}
+.sort-container select{padding:6px 10px;border:1px solid var(--secondary-color);border-radius:6px;font-size:0.9rem}
+
+.modal{display:none;position:fixed;inset:0;backdrop-filter:blur(2px);align-items:center;justify-content:center;z-index:1000}
+.modal.show{display:flex}
+.modal-box{background:var(--card-background);padding:20px 30px;border-radius:12px;box-shadow:0 6px 20px var(--soft-shadow);color:var(--text-color)}
+.modal-box h3{margin-bottom:15px}
+.modal-box button{margin-top:15px;padding:6px 14px;border:none;border-radius:6px;background:var(--primary-color);color:#fff;cursor:pointer}
+
+.install-overlay {
+    display: flex;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-width: 280px;
+    backdrop-filter: blur(8px);
+    transform: translateY(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+}
+.install-overlay.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+.install-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.install-box p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+#bannerInstallBtn {
+    background: #fff;
+    color: var(--primary-color);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+#bannerInstallBtn:hover {
+    transform: scale(1.05);
+}
+#dismissInstall {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 1;
+}
+#dismissInstall:hover {
+    color: #fff;
+    background: rgba(0,0,0,0.1);
+    border-radius: 50%;
+}
+
+.install-btn {
+    margin-top: 12px;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 30px;
+    background: var(--secondary-color);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 6px var(--soft-shadow);
+    transition: background .3s;
+}
+.install-btn:hover {
+    background: var(--primary-color);
+}
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.install-btn.fab {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    background: rgba(255,255,255,0.2);
+    box-shadow: none;
+    transition: transform 0.2s;
+    margin-top: 0;
+}
+.install-btn.fab i {
+    font-size: 1rem;
+    color: #fff;
+}
+.install-btn.fab:hover {
+    background: var(--primary-color);
+    transform: scale(1.05);
+}
+
+footer .footer-content { gap: 8px }
+
+.contact-row { display: flex; gap: 8px; align-items: center; margin-top: 8px }
+.contact-row a.tel { color: var(--secondary-color); text-decoration: none; font-weight: 600 }
+.contact-row a.wa { color: #25D366; font-size: 1.1rem }
+.contact-row button { background: none; border: none; color: var(--primary-color); font-size: 1.1rem; cursor: pointer }
