@@ -11,8 +11,10 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        // Fix: Match the variable names used in App.tsx
+        'process.env.GOOGLE_API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.GOOGLE_API_KEY),
+        'process.env.AI_MODEL': JSON.stringify(env.AI_MODEL || 'gemini-1.5-flash'),
+        'process.env.MISTRAL_API_KEY': JSON.stringify(env.MISTRAL_API_KEY)
       },
       resolve: {
         alias: {
