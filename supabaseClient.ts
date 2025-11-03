@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { Business, Category } from './types';
+import { DataVersion } from './cacheService';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -199,6 +200,52 @@ export const deleteBusiness = async (businessId: string): Promise<void> => {
     .eq('id', businessId);
   
   if (error) throw error;
+};
+
+// ============================================
+// Data Version/Sync Functions
+// ============================================
+
+/**
+ * Get current data version from server
+ * Returns count and last update timestamp for cache validation
+ */
+export const getDataVersion = async (): Promise<DataVersion> => {
+  try {
+    // Get total count
+    const { count, error: countError } = await supabase
+      .from('businesses')
+      .select('*', { count: 'exact', head: true });
+    
+    if (countError) throw countError;
+    
+    // Get last updated timestamp
+    const { data, error: updateError } = await supabase
+      .from('businesses')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single();
+    
+    if (updateError && updateError.code !== 'PGRST116') {
+      // PGRST116 means no rows, which is fine for empty table
+      throw updateError;
+    }
+    
+    return {
+      business_count: count || 0,
+      last_updated: data?.updated_at || new Date().toISOString(),
+      last_sync: Date.now(),
+    };
+  } catch (error) {
+    console.error('Error fetching data version:', error);
+    // Return safe defaults on error
+    return {
+      business_count: 0,
+      last_updated: new Date().toISOString(),
+      last_sync: Date.now(),
+    };
+  }
 };
 
 // ============================================
