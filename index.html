@@ -6,6 +6,19 @@
     <title>जवळा व्यवसाय निर्देशिका - Jawala Business Directory</title>
     <meta name="description" content="जवळा गाव व्यवसाय निर्देशिका:गावातील व्यवसाय शोधण्यासाठी एक सुलभ साधन. आपल्या जवळच्या सेवा आणि व्यवसायांबद्दल त्वरित माहिती मिळवा.">
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2C5F2D">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="जवळा व्यवसाय">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- iOS Splash Screens & Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-192x192.png">
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="जवळा व्यवसाय निर्देशिका - Jawala Business Directory">
@@ -33,11 +46,11 @@
         theme: {
           extend: {
             colors: {
-              'background': '#F5F5F5',       // Light Gray
-              'surface': '#FFFFFF',         // Pure White
-              'primary': '#2C5F2D',          // Deep Forest Green
-              'secondary': '#97BC62',        // Sage Green
-              'text-primary': '#333333',     // Dark Charcoal
+              'background': '#F5F5F5',
+              'surface': '#FFFFFF',
+              'primary': '#2C5F2D',
+              'secondary': '#97BC62',
+              'text-primary': '#333333',
               'text-secondary': '#555555',
               'border-color': '#E0E0E0',
             },
@@ -87,13 +100,12 @@
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb {
-        background: #97BC62; /* secondary color */
+        background: #97BC62;
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #2C5F2D; /* primary color */
+        background: #2C5F2D;
       }
-      /* For Firefox */
       * {
         scrollbar-width: thin;
         scrollbar-color: #97BC62 #f1f1f1;
@@ -110,9 +122,80 @@
 }
 </script>
 <link rel="stylesheet" href="/index.css">
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('✅ Service Worker registered:', registration.scope);
+          
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available
+                if (confirm('नवीन आवृत्ती उपलब्ध आहे. अपडेट करायचे?')) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  window.location.reload();
+                }
+              }
+            });
+          });
+        })
+        .catch((error) => {
+          console.error('❌ Service Worker registration failed:', error);
+        });
+    });
+  }
+
+  // Install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('📱 PWA install prompt ready');
+  });
+
+  // Function to trigger install (call this from your app)
+  window.showInstallPrompt = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('✅ PWA installed');
+        }
+        deferredPrompt = null;
+      });
+    }
+  };
+</script>
 </head>
 <body class="bg-background text-text-primary antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    
+    <!-- Offline indicator -->
+    <div id="offline-indicator" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #f44336; color: white; padding: 10px 20px; border-radius: 25px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+      📴 तुम्ही ऑफलाइन आहात
+    </div>
+    
+    <script>
+      // Online/Offline indicator
+      function updateOnlineStatus() {
+        const indicator = document.getElementById('offline-indicator');
+        if (!navigator.onLine) {
+          indicator.style.display = 'block';
+        } else {
+          indicator.style.display = 'none';
+        }
+      }
+      
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
+    </script>
 </body>
 </html>
