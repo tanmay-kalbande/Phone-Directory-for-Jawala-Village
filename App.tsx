@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Business, Category, BusinessData } from './types';
-import { data } from './data';
 import CategoryGrid from './components/CategoryGrid';
 import BusinessList from './components/BusinessList';
 import { GoogleGenAI, Type } from "@google/genai";
+import * as SupabaseService from './supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 // --- HELPER FUNCTIONS ---
 const formatPhoneNumber = (phoneNumber: string): string => {
@@ -163,7 +164,7 @@ const AiAssistant: React.FC<{
             let errorMessage = 'उत्तर मिळवताना एक समस्या आली. कृपया पुन्हा प्रयत्न करा.';
             if (err instanceof Error) {
                 if (err.message.includes('AI_MODEL') || err.message.includes('API_KEY') || err.message.includes('Unsupported model')) {
-                    errorMessage = err.message; // Show specific config errors in English
+                    errorMessage = err.message;
                 } else if (err.message.includes('API key') || err.message.includes('authentication') || err.message.includes('Mistral API error')) {
                     errorMessage = 'The provided API key is invalid. Please check your configuration.';
                 }
@@ -176,8 +177,8 @@ const AiAssistant: React.FC<{
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onQueryChange(e.target.value);
-        if (response) setResponse(null); // Clear previous AI response
-        if (error) setError(''); // Clear previous error
+        if (response) setResponse(null);
+        if (error) setError('');
     };
     
     const AiBusinessResultCard: React.FC<{business: Business}> = ({ business }) => (
@@ -380,7 +381,7 @@ const BusinessDetailModal: React.FC<{
                 </main>
 
                 <footer className="p-4 border-t border-border-color grid grid-cols-2 gap-3 bg-background/70 rounded-b-xl">
-                    <a href={`https://wa.me/91${business.contactNumber}?text=${encodeURIComponent('नमस्कार, मी “जवळा व्यवसाय निर्देशिका” वरून आपला संपर्क घेतला आहे.')}`} target="_blank" rel="noopener noreferrer" className="w-full text-center py-3 rounded-lg transition-all flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold"><i className="fab fa-whatsapp text-xl"></i> WhatsApp</a>
+                    <a href={`https://wa.me/91${business.contactNumber}?text=${encodeURIComponent('नमस्कार, मी "जवळा व्यवसाय निर्देशिका" वरून आपला संपर्क घेतला आहे.')}`} target="_blank" rel="noopener noreferrer" className="w-full text-center py-3 rounded-lg transition-all flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold"><i className="fab fa-whatsapp text-xl"></i> WhatsApp</a>
                     <button onClick={shareBusinessDetails} disabled={isSharing} className="w-full text-center py-3 rounded-lg transition-all flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/90 text-white font-bold disabled:bg-gray-400">
                         {isSharing ? <><i className="fas fa-spinner fa-spin"></i> शेअर करत आहे...</> : <><i className="fas fa-share text-xl"></i> शेअर करा</>}
                     </button>
@@ -413,17 +414,25 @@ const Footer: React.FC<{ onAdminLoginClick: () => void }> = ({ onAdminLoginClick
 
 // --- ADMIN COMPONENTS ---
 
-const LoginModal: React.FC<{ onLoginSuccess: () => void, onClose: () => void }> = ({ onLoginSuccess, onClose }) => {
-    const [username, setUsername] = useState('');
+const LoginModal: React.FC<{ onLoginSuccess: (user: User) => void, onClose: () => void }> = ({ onLoginSuccess, onClose }) => {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (username === 'admin' && password === '123') {
-            onLoginSuccess();
-        } else {
-            setError('चुकीचे युझरनेम किंवा पासवर्ड.');
+        setError('');
+        setIsLoading(true);
+
+        try {
+            const { user } = await SupabaseService.signIn(email, password);
+            onLoginSuccess(user);
+        } catch (err: any) {
+            console.error('Login error:', err);
+            setError(err.message || 'लॉगिन अयशस्वी. कृपया पुन्हा प्रयत्न करा.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -432,10 +441,32 @@ const LoginModal: React.FC<{ onLoginSuccess: () => void, onClose: () => void }> 
             <div className="bg-surface rounded-xl shadow-xl w-11/12 max-w-sm m-4 p-6" onClick={e => e.stopPropagation()}>
                 <h3 className="font-inter text-2xl font-bold text-primary mb-4 text-center">ॲडमिन लॉगिन</h3>
                 <form onSubmit={handleLogin} className="space-y-4">
-                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="युझरनेम" className="w-full p-3 border-2 border-border-color rounded-lg" required />
-                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="पासवर्ड" className="w-full p-3 border-2 border-border-color rounded-lg" required />
+                    <input 
+                        type="email" 
+                        value={email} 
+                        onChange={e => setEmail(e.target.value)} 
+                        placeholder="ईमेल" 
+                        className="w-full p-3 border-2 border-border-color rounded-lg" 
+                        required 
+                        disabled={isLoading}
+                    />
+                    <input 
+                        type="password" 
+                        value={password} 
+                        onChange={e => setPassword(e.target.value)} 
+                        placeholder="पासवर्ड" 
+                        className="w-full p-3 border-2 border-border-color rounded-lg" 
+                        required 
+                        disabled={isLoading}
+                    />
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                    <button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg">लॉगिन करा</button>
+                    <button 
+                        type="submit" 
+                        disabled={isLoading}
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? 'लॉगिन करत आहे...' : 'लॉगिन करा'}
+                    </button>
                 </form>
             </div>
         </div>
@@ -446,7 +477,8 @@ const AdminDashboard: React.FC<{
     onAdd: () => void;
     onEdit: () => void;
     onClose: () => void;
-}> = ({ onAdd, onEdit, onClose }) => (
+    onLogout: () => void;
+}> = ({ onAdd, onEdit, onClose, onLogout }) => (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fadeInUp" style={{animationDuration: '0.3s'}} onClick={onClose}>
         <div className="bg-surface rounded-xl shadow-xl w-11/12 max-w-sm m-4 p-6 text-center" onClick={e => e.stopPropagation()}>
             <h3 className="font-inter text-2xl font-bold text-primary mb-6">ॲडमिन पॅनल</h3>
@@ -457,6 +489,9 @@ const AdminDashboard: React.FC<{
                 <button onClick={onEdit} className="w-full text-lg py-4 px-6 bg-secondary text-white font-bold rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center gap-3">
                     <i className="fas fa-edit"></i> व्यवसाय संपादित करा
                 </button>
+                <button onClick={onLogout} className="w-full text-lg py-4 px-6 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all flex items-center justify-center gap-3">
+                    <i className="fas fa-sign-out-alt"></i> लॉगआउट
+                </button>
             </div>
             <button onClick={onClose} className="mt-6 text-sm text-text-secondary hover:underline">बंद करा</button>
         </div>
@@ -466,33 +501,65 @@ const AdminDashboard: React.FC<{
 const EditBusinessList: React.FC<{
     businesses: Business[];
     onSelect: (business: Business) => void;
+    onDelete: (businessId: string) => void;
     onClose: () => void;
     onBack: () => void;
-}> = ({ businesses, onSelect, onClose, onBack }) => (
-     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fadeInUp" style={{animationDuration: '0.3s'}} onClick={onClose}>
-        <div className="bg-surface rounded-xl shadow-xl w-11/12 max-w-lg m-4 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
-            <header className="p-4 border-b border-border-color flex justify-between items-center sticky top-0 bg-surface/80 backdrop-blur-sm">
-                <h3 className="font-inter text-xl font-bold text-primary">व्यवसाय संपादित करा</h3>
-                 <button onClick={onBack} className="text-sm text-text-secondary hover:underline flex items-center gap-2"><i className="fas fa-arrow-left"></i> मागे</button>
-            </header>
-            <ul className="overflow-y-auto p-4 space-y-2">
-                {businesses.slice().sort((a,b) => a.shopName.localeCompare(b.shopName)).map(b => (
-                    <li key={b.id} className="flex justify-between items-center p-3 bg-background rounded-lg">
-                        <div>
-                            <p className="font-semibold">{b.shopName}</p>
-                            <p className="text-sm text-text-secondary">{b.ownerName}</p>
-                        </div>
-                        <button onClick={() => onSelect(b)} className="px-4 py-2 bg-secondary text-white font-semibold rounded-lg text-sm hover:bg-secondary/90">संपादित करा</button>
-                    </li>
-                ))}
-            </ul>
-             <footer className="p-3 border-t border-border-color text-center sticky bottom-0 bg-surface/80 backdrop-blur-sm">
-                 <button onClick={onClose} className="text-sm text-text-secondary hover:underline">बंद करा</button>
-            </footer>
-        </div>
-    </div>
-);
+}> = ({ businesses, onSelect, onDelete, onClose, onBack }) => {
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
+    const handleDelete = async (businessId: string, businessName: string) => {
+        if (!confirm(`खात्री आहे का की तुम्ही "${businessName}" हटवू इच्छिता?`)) return;
+        
+        setDeletingId(businessId);
+        try {
+            await onDelete(businessId);
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('व्यवसाय हटवताना त्रुटी आली');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fadeInUp" style={{animationDuration: '0.3s'}} onClick={onClose}>
+            <div className="bg-surface rounded-xl shadow-xl w-11/12 max-w-lg m-4 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                <header className="p-4 border-b border-border-color flex justify-between items-center sticky top-0 bg-surface/80 backdrop-blur-sm">
+                    <h3 className="font-inter text-xl font-bold text-primary">व्यवसाय संपादित करा</h3>
+                    <button onClick={onBack} className="text-sm text-text-secondary hover:underline flex items-center gap-2"><i className="fas fa-arrow-left"></i> मागे</button>
+                </header>
+                <ul className="overflow-y-auto p-4 space-y-2">
+                    {businesses.slice().sort((a,b) => a.shopName.localeCompare(b.shopName)).map(b => (
+                        <li key={b.id} className="flex justify-between items-center p-3 bg-background rounded-lg">
+                            <div className="flex-1 min-w-0 pr-3">
+                                <p className="font-semibold truncate">{b.shopName}</p>
+                                <p className="text-sm text-text-secondary truncate">{b.ownerName}</p>
+                            </div>
+                            <div className="flex gap-2 flex-shrink-0">
+                                <button 
+                                    onClick={() => onSelect(b)} 
+                                    className="px-3 py-2 bg-secondary text-white font-semibold rounded-lg text-sm hover:bg-secondary/90"
+                                >
+                                    संपादित करा
+                                </button>
+                                <button 
+                                    onClick={() => handleDelete(b.id, b.shopName)}
+                                    disabled={deletingId === b.id}
+                                    className="px-3 py-2 bg-red-600 text-white font-semibold rounded-lg text-sm hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    {deletingId === b.id ? '...' : 'हटवा'}
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+                <footer className="p-3 border-t border-border-color text-center sticky bottom-0 bg-surface/80 backdrop-blur-sm">
+                    <button onClick={onClose} className="text-sm text-text-secondary hover:underline">बंद करा</button>
+                </footer>
+            </div>
+        </div>
+    );
+};
 
 interface CustomDropdownProps {
     options: Category[];
@@ -535,10 +602,9 @@ const BusinessForm: React.FC<{
     categories: Category[], 
     onClose: () => void, 
     onSave: (business: Business) => void,
-    existingBusiness: Business | null 
-}> = ({ categories, onClose, onSave, existingBusiness }) => {
-    // FIX: The original type `Partial<Business> & { services?: string }` created an impossible intersection type for the `services` property (`string[] & string`).
-    // Using `Omit` correctly overrides the `services` property type to be `string` for form handling.
+    existingBusiness: Business | null,
+    isSaving: boolean
+}> = ({ categories, onClose, onSave, existingBusiness, isSaving }) => {
     const [formData, setFormData] = useState<Omit<Partial<Business>, 'services'> & { services?: string }>({});
     const [formMessage, setFormMessage] = useState('');
     const isEditing = !!existingBusiness;
@@ -572,7 +638,7 @@ const BusinessForm: React.FC<{
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const businessToSave: Business = {
-            id: existingBusiness?.id || '', // Keep ID for editing
+            id: existingBusiness?.id || '',
             shopName: formData.shopName || '',
             ownerName: formData.ownerName || '',
             contactNumber: formData.contactNumber || '',
@@ -584,8 +650,6 @@ const BusinessForm: React.FC<{
             services: typeof formData.services === 'string' ? formData.services.split(',').map(s => s.trim()).filter(Boolean) : [],
         };
         onSave(businessToSave);
-        setFormMessage(isEditing ? 'व्यवसाय यशस्वीरित्या अपडेट झाला!' : 'व्यवसाय यशस्वीरित्या जोडला गेला!');
-        setTimeout(() => onClose(), 1500);
     };
     
     const inputStyles = "w-full p-3 border-2 border-border-color rounded-lg bg-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all";
@@ -595,30 +659,31 @@ const BusinessForm: React.FC<{
             <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-xl w-11/12 max-w-2xl m-4 p-6 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <h3 className="font-inter text-2xl font-bold text-primary mb-6 text-center">{isEditing ? 'व्यवसाय अपडेट करा' : 'नवीन व्यवसाय जोडा'}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input name="shopName" value={formData.shopName || ''} onChange={handleChange} placeholder="दुकानाचे नाव" className={inputStyles} required />
-                    <input name="ownerName" value={formData.ownerName || ''} onChange={handleChange} placeholder="मालकाचे नाव" className={inputStyles} required />
-                    <input name="contactNumber" type="tel" value={formData.contactNumber || ''} onChange={handleChange} placeholder="संपर्क क्रमांक" className={`${inputStyles} md:col-span-2`} required />
+                    <input name="shopName" value={formData.shopName || ''} onChange={handleChange} placeholder="दुकानाचे नाव" className={inputStyles} required disabled={isSaving} />
+                    <input name="ownerName" value={formData.ownerName || ''} onChange={handleChange} placeholder="मालकाचे नाव" className={inputStyles} required disabled={isSaving} />
+                    <input name="contactNumber" type="tel" value={formData.contactNumber || ''} onChange={handleChange} placeholder="संपर्क क्रमांक" className={`${inputStyles} md:col-span-2`} required disabled={isSaving} />
                     <CustomDropdown options={categories} selectedId={formData.category} onChange={id => setFormData({...formData, category: id})} placeholder="श्रेणी निवडा" />
-                    <textarea name="address" value={formData.address || ''} onChange={handleChange} placeholder="पत्ता" className={`${inputStyles} md:col-span-2`} />
-                    <input name="openingHours" value={formData.openingHours || ''} onChange={handleChange} placeholder="उघडण्याची वेळ (उदा. सकाळी १० ते रात्री ९)" className={`${inputStyles} md:col-span-2`} />
-                    <textarea name="services" value={formData.services || ''} onChange={handleChange} placeholder="सेवा/उत्पादने (कॉमाने वेगळे करा)" className={`${inputStyles} md:col-span-2`} />
+                    <textarea name="address" value={formData.address || ''} onChange={handleChange} placeholder="पत्ता" className={`${inputStyles} md:col-span-2`} disabled={isSaving} />
+                    <input name="openingHours" value={formData.openingHours || ''} onChange={handleChange} placeholder="उघडण्याची वेळ (उदा. सकाळी १० ते रात्री ९)" className={`${inputStyles} md:col-span-2`} disabled={isSaving} />
+                    <textarea name="services" value={formData.services || ''} onChange={handleChange} placeholder="सेवा/उत्पादने (कॉमाने वेगळे करा)" className={`${inputStyles} md:col-span-2`} disabled={isSaving} />
                 </div>
                 <div className="flex flex-wrap gap-6 my-4">
-                   <label className="flex items-center gap-2"><input type="checkbox" name="homeDelivery" checked={formData.homeDelivery || false} onChange={handleCheckboxChange} /> होम डिलिव्हरी</label>
+                   <label className="flex items-center gap-2"><input type="checkbox" name="homeDelivery" checked={formData.homeDelivery || false} onChange={handleCheckboxChange} disabled={isSaving} /> होम डिलिव्हरी</label>
                    <fieldset className="flex items-center gap-4">
                       <legend className="mr-2 font-semibold">पेमेंट:</legend>
-                      <label className="flex items-center gap-1"><input type="checkbox" value="UPI" checked={formData.paymentOptions?.includes('UPI') || false} onChange={handleCheckboxChange} /> UPI</label>
-                      <label className="flex items-center gap-1"><input type="checkbox" value="Cash" checked={formData.paymentOptions?.includes('Cash') || false} onChange={handleCheckboxChange} /> Cash</label>
-                      <label className="flex items-center gap-1"><input type="checkbox" value="Card" checked={formData.paymentOptions?.includes('Card') || false} onChange={handleCheckboxChange} /> Card</label>
+                      <label className="flex items-center gap-1"><input type="checkbox" value="UPI" checked={formData.paymentOptions?.includes('UPI') || false} onChange={handleCheckboxChange} disabled={isSaving} /> UPI</label>
+                      <label className="flex items-center gap-1"><input type="checkbox" value="Cash" checked={formData.paymentOptions?.includes('Cash') || false} onChange={handleCheckboxChange} disabled={isSaving} /> Cash</label>
+                      <label className="flex items-center gap-1"><input type="checkbox" value="Card" checked={formData.paymentOptions?.includes('Card') || false} onChange={handleCheckboxChange} disabled={isSaving} /> Card</label>
                    </fieldset>
                 </div>
                 {formMessage && <p className="text-center text-green-600 mb-4 font-bold">{formMessage}</p>}
-                <button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg">{isEditing ? 'अपडेट करा' : 'व्यवसाय जोडा'}</button>
+                <button type="submit" disabled={isSaving} className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
+                    {isSaving ? 'सेव्ह करत आहे...' : (isEditing ? 'अपडेट करा' : 'व्यवसाय जोडा')}
+                </button>
             </form>
         </div>
     );
 };
-
 
 // --- MAIN APP ---
 
@@ -630,28 +695,141 @@ const App: React.FC = () => {
     const [viewedBusiness, setViewedBusiness] = useState<Business | null>(null);
     
     // Admin state
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [showLogin, setShowLogin] = useState(false);
     const [adminView, setAdminView] = useState<'dashboard' | 'add' | 'edit-list' | null>(null);
     const [businessToEdit, setBusinessToEdit] = useState<Business | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
+    // Load initial data
     useEffect(() => {
-        setTimeout(() => {
-            const loadedData = { ...data, categories: [...data.categories].sort((a,b) => a.name.localeCompare(b.name)) };
-            setBusinessData(loadedData);
+        const loadData = async () => {
+            try {
+                // Import cache service dynamically
+                const CacheService = await import('./cacheService');
+                
+                // Try to load from cache first (instant load)
+                const cachedData = await Promise.all([
+                    CacheService.getCachedBusinesses(),
+                    CacheService.getCachedCategories(),
+                ]).catch(() => [[], []]);
 
-            const params = new URLSearchParams(window.location.search);
-            const businessId = params.get('businessId');
-            if (businessId) {
-                const businessToView = loadedData.businesses.find(b => b.id === businessId);
-                if (businessToView) {
-                    setTimeout(() => {
-                        setViewedBusiness(businessToView);
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }, 100);
+                if (cachedData[0].length > 0) {
+                    // Show cached data immediately
+                    setBusinessData({
+                        categories: cachedData[1].sort((a, b) => a.name.localeCompare(b.name)),
+                        businesses: cachedData[0]
+                    });
+                    setIsLoading(false);
                 }
+
+                // Then do smart sync in background
+                const syncResult = await CacheService.smartSync(
+                    // Fetch remote version (lightweight)
+                    async () => {
+                        const version = await SupabaseService.getDataVersion();
+                        return {
+                            ...version,
+                            last_sync: Date.now(),
+                        };
+                    },
+                    // Fetch all data (only if needed)
+                    async () => {
+                        const [categories, businesses] = await Promise.all([
+                            SupabaseService.fetchCategories(),
+                            SupabaseService.fetchBusinesses()
+                        ]);
+                        return { categories, businesses };
+                    }
+                );
+
+                // Update UI with fresh data if sync happened
+                if (syncResult.action !== 'no_change') {
+                    console.log(`📱 Data ${syncResult.fromCache ? 'from cache' : 'synced from server'}`);
+                    setBusinessData({
+                        categories: syncResult.categories.sort((a, b) => a.name.localeCompare(b.name)),
+                        businesses: syncResult.businesses
+                    });
+                }
+
+                // Check for shared business in URL
+                const params = new URLSearchParams(window.location.search);
+                const businessId = params.get('businessId');
+                if (businessId) {
+                    const businessToView = syncResult.businesses.find(b => b.id === businessId);
+                    if (businessToView) {
+                        setTimeout(() => {
+                            setViewedBusiness(businessToView);
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }, 100);
+                    }
+                }
+
+                // Check for existing session
+                const user = await SupabaseService.getCurrentUser();
+                if (user) {
+                    const isAdmin = await SupabaseService.isUserAdmin(user.id);
+                    if (isAdmin) {
+                        setCurrentUser(user);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('डेटा लोड करताना त्रुटी आली. पेज रीफ्रेश करा.');
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
-        }, 500);
+        };
+
+        loadData();
+
+        // Subscribe to real-time changes
+        const subscription = SupabaseService.subscribeToBusinessChanges(async (payload) => {
+            console.log('🔄 Real-time change detected:', payload.eventType);
+            
+            // Import cache service
+            const CacheService = await import('./cacheService');
+            
+            // Update cache based on event type
+            if (payload.eventType === 'INSERT' && payload.new) {
+                const newBusiness = SupabaseService.dbBusinessToBusiness(payload.new);
+                await CacheService.updateCachedBusiness(newBusiness);
+                setBusinessData(prev => ({
+                    ...prev,
+                    businesses: [newBusiness, ...prev.businesses]
+                }));
+            } else if (payload.eventType === 'UPDATE' && payload.new) {
+                const updatedBusiness = SupabaseService.dbBusinessToBusiness(payload.new);
+                await CacheService.updateCachedBusiness(updatedBusiness);
+                setBusinessData(prev => ({
+                    ...prev,
+                    businesses: prev.businesses.map(b => 
+                        b.id === updatedBusiness.id ? updatedBusiness : b
+                    )
+                }));
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+                await CacheService.deleteCachedBusiness(payload.old.id);
+                setBusinessData(prev => ({
+                    ...prev,
+                    businesses: prev.businesses.filter(b => b.id !== payload.old.id)
+                }));
+            }
+            
+            // Update version in cache
+            try {
+                const newVersion = await SupabaseService.getDataVersion();
+                await CacheService.setLocalVersion({
+                    ...newVersion,
+                    last_sync: Date.now(),
+                });
+            } catch (error) {
+                console.error('Failed to update version:', error);
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
     const handleCategorySelect = useCallback((categoryId: string | null) => {
@@ -666,22 +844,70 @@ const App: React.FC = () => {
     
     // --- Admin Handlers ---
     const handleAdminLoginClick = () => setShowLogin(true);
-    const handleLoginSuccess = () => { setShowLogin(false); setAdminView('dashboard'); };
-    const handleCloseAdmin = () => { setAdminView(null); setBusinessToEdit(null); };
+    
+    const handleLoginSuccess = (user: User) => {
+        setCurrentUser(user);
+        setShowLogin(false);
+        setAdminView('dashboard');
+    };
 
-    const handleSaveBusiness = (businessToSave: Business) => {
-        setBusinessData(currentData => {
-            const businesses = [...currentData.businesses];
-            if (businessToSave.id) { // Update existing
-                const index = businesses.findIndex(b => b.id === businessToSave.id);
-                if (index > -1) businesses[index] = businessToSave;
-            } else { // Add new
-                businesses.unshift({ ...businessToSave, id: new Date().getTime().toString() });
+    const handleLogout = async () => {
+        try {
+            await SupabaseService.signOut();
+            setCurrentUser(null);
+            setAdminView(null);
+            alert('तुम्ही यशस्वीरित्या लॉगआउट झाला आहात.');
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('लॉगआउट करताना त्रुटी आली.');
+        }
+    };
+
+    const handleCloseAdmin = () => { 
+        setAdminView(null); 
+        setBusinessToEdit(null); 
+    };
+
+    const handleSaveBusiness = async (businessToSave: Business) => {
+        setIsSaving(true);
+        try {
+            if (businessToSave.id) {
+                // Update existing
+                await SupabaseService.updateBusiness(businessToSave);
+                alert('व्यवसाय यशस्वीरित्या अपडेट झाला!');
+            } else {
+                // Add new
+                await SupabaseService.addBusiness(businessToSave);
+                alert('व्यवसाय यशस्वीरित्या जोडला गेला!');
             }
-            return { ...currentData, businesses };
-        });
-        setAdminView('dashboard'); // Return to dashboard after saving
-        setBusinessToEdit(null);
+
+            // Reload businesses
+            const businesses = await SupabaseService.fetchBusinesses();
+            setBusinessData(prev => ({ ...prev, businesses }));
+            
+            setAdminView('dashboard');
+            setBusinessToEdit(null);
+        } catch (error: any) {
+            console.error('Save error:', error);
+            alert(`व्यवसाय सेव्ह करताना त्रुटी: ${error.message}`);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleDeleteBusiness = async (businessId: string) => {
+        try {
+            await SupabaseService.deleteBusiness(businessId);
+            
+            // Reload businesses
+            const businesses = await SupabaseService.fetchBusinesses();
+            setBusinessData(prev => ({ ...prev, businesses }));
+            
+            alert('व्यवसाय यशस्वीरित्या हटवला!');
+        } catch (error: any) {
+            console.error('Delete error:', error);
+            throw error;
+        }
     };
 
     const filteredBusinesses = useMemo(() => {
@@ -767,12 +993,14 @@ const App: React.FC = () => {
             {adminView === 'dashboard' && <AdminDashboard 
                 onAdd={() => { setBusinessToEdit(null); setAdminView('add'); }}
                 onEdit={() => setAdminView('edit-list')}
+                onLogout={handleLogout}
                 onClose={handleCloseAdmin}
             />}
 
             {adminView === 'edit-list' && <EditBusinessList
                 businesses={businessData.businesses}
                 onSelect={(business) => { setBusinessToEdit(business); setAdminView('add'); }}
+                onDelete={handleDeleteBusiness}
                 onBack={() => setAdminView('dashboard')}
                 onClose={handleCloseAdmin}
             />}
@@ -781,6 +1009,7 @@ const App: React.FC = () => {
                 categories={businessData.categories}
                 onSave={handleSaveBusiness}
                 existingBusiness={businessToEdit}
+                isSaving={isSaving}
                 onClose={() => {
                     setAdminView(businessToEdit ? 'edit-list' : 'dashboard');
                     setBusinessToEdit(null);
